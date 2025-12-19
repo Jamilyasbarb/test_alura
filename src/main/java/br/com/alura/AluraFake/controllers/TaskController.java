@@ -22,8 +22,9 @@ public class TaskController {
     }
 
     @PostMapping("/new/singlechoice")
-    public ResponseEntity newSingleChoice() {
-        return ResponseEntity.ok().build();
+    public ResponseEntity newSingleChoice(@Valid @RequestBody CreateTaskDTO createTaskDTO) {
+        Task task = taskService.createTaskOneChoice(createTaskDTO);
+        return ResponseEntity.ok().body(task);
     }
 
     @PostMapping("/new/multiplechoice")

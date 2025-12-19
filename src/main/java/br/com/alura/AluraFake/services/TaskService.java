@@ -3,6 +3,7 @@ package br.com.alura.AluraFake.services;
 import br.com.alura.AluraFake.domain.Course;
 import br.com.alura.AluraFake.domain.Task;
 import br.com.alura.AluraFake.domain.enums.CourseStatus;
+import br.com.alura.AluraFake.dto.TaskOptionDTO;
 import br.com.alura.AluraFake.dto.task.CreateTaskDTO;
 import br.com.alura.AluraFake.exception.DataIntegrityException;
 import br.com.alura.AluraFake.exception.ObjectNotFoundException;
@@ -32,6 +33,13 @@ public class TaskService {
         return taskRepository.save(taskMapper.toEntityFromCreateDTO(createTaskDTO, course));
     }
 
+    public Task createTaskOneChoice(CreateTaskDTO createTaskDTO){
+        Course course = courseRepository.findById(createTaskDTO.courseId()).orElseThrow(() -> new ObjectNotFoundException(Course.class));
+        validateDefault(createTaskDTO, course);
+        validateTaskOneChoice(createTaskDTO);
+        return taskMapper.toEntityFromCreateDTO(createTaskDTO, course);
+    }
+
     public void validateDefault(CreateTaskDTO createTaskDTO, Course course){
         if (!course.getStatus().equals(CourseStatus.BUILDING))
             throw new DataIntegrityException("Não foi possível adicionar a tarefa pois o status do Curso não está BUILDING");
@@ -41,6 +49,28 @@ public class TaskService {
         if (!tasks.isEmpty()){
             throw new DataIntegrityException("Já existe uma Tarefa com esse enunciado!");
         }
+    }
+
+    public void validateTaskOneChoice(CreateTaskDTO createTaskDTO){
+        if (createTaskDTO.options().size() < 2 || createTaskDTO.options().size() > 5)
+            throw new DataIntegrityException("Adicione de 2 a 5 alternativas.");
+
+
+        List<TaskOptionDTO> optionsChoice = createTaskDTO.options().stream().filter(TaskOptionDTO::isCorrect).toList();
+        if (optionsChoice.size() > 1)
+            throw new DataIntegrityException("Assine apenas uma opção como correta.");
+
+        for (int i = 0; i < createTaskDTO.options().size(); i++) {
+            TaskOptionDTO taskOptionI = createTaskDTO.options().get(i);
+            for (int j = i+1; j < createTaskDTO.options().size(); j++) {
+                TaskOptionDTO taskOptionJ = createTaskDTO.options().get(j);
+                if (taskOptionI.option().equalsIgnoreCase(taskOptionJ.option()) || taskOptionI.option().equalsIgnoreCase(createTaskDTO.statement()))
+                    throw new DataIntegrityException("Não é possível inserir alternativas iguais as outras" +
+                            " e nem iguais ao enunciado da questão!");
+
+            }
+        }
+
     }
 
 

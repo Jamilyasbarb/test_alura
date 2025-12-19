@@ -1,6 +1,6 @@
-package br.com.alura.AluraFake.course;
+package br.com.alura.AluraFake.domain;
 
-import br.com.alura.AluraFake.user.User;
+import br.com.alura.AluraFake.domain.enums.CourseStatus;
 import jakarta.persistence.*;
 import org.springframework.util.Assert;
 
@@ -18,7 +18,7 @@ public class Course {
     @ManyToOne
     private User instructor;
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private CourseStatus courseStatus;
     private LocalDateTime publishedAt;
 
     @Deprecated
@@ -29,7 +29,7 @@ public class Course {
         this.title = title;
         this.instructor = instructor;
         this.description = description;
-        this.status = Status.BUILDING;
+        this.courseStatus = CourseStatus.BUILDING;
     }
 
     public Long getId() {
@@ -44,8 +44,8 @@ public class Course {
         return title;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setStatus(CourseStatus courseStatus) {
+        this.courseStatus = courseStatus;
     }
 
     public User getInstructor() {
@@ -56,8 +56,8 @@ public class Course {
         return description;
     }
 
-    public Status getStatus() {
-        return status;
+    public CourseStatus getStatus() {
+        return courseStatus;
     }
 
     public LocalDateTime getPublishedAt() {

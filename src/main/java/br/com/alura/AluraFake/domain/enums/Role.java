@@ -1,4 +1,4 @@
-package br.com.alura.AluraFake.user;
+package br.com.alura.AluraFake.domain.enums;
 
 public enum Role {
     STUDENT,

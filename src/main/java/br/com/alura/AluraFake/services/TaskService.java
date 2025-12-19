@@ -2,6 +2,7 @@ package br.com.alura.AluraFake.services;
 
 import br.com.alura.AluraFake.domain.Course;
 import br.com.alura.AluraFake.domain.Task;
+import br.com.alura.AluraFake.domain.TaskOptions;
 import br.com.alura.AluraFake.domain.enums.CourseStatus;
 import br.com.alura.AluraFake.dto.TaskOptionDTO;
 import br.com.alura.AluraFake.dto.task.CreateTaskDTO;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TaskService {
@@ -36,8 +38,18 @@ public class TaskService {
     public Task createTaskOneChoice(CreateTaskDTO createTaskDTO){
         Course course = courseRepository.findById(createTaskDTO.courseId()).orElseThrow(() -> new ObjectNotFoundException(Course.class));
         validateDefault(createTaskDTO, course);
-        validateTaskOneChoice(createTaskDTO);
-        return taskMapper.toEntityFromCreateDTO(createTaskDTO, course);
+        validateTaskOneChoice(createTaskDTO, false);
+        Task task = taskMapper.toEntityFromCreateDTO(createTaskDTO, course);
+
+        if (Objects.nonNull(createTaskDTO.options())) {
+            List<TaskOptions> options = createTaskDTO.options().stream()
+                    .map(TaskOptions::new)
+                    .toList();
+
+            options.forEach(option -> option.setTask(task));
+            task.setTaskOptions(options);
+        }
+        return taskRepository.save(task);
     }
 
     public void validateDefault(CreateTaskDTO createTaskDTO, Course course){
@@ -51,15 +63,33 @@ public class TaskService {
         }
     }
 
-    public void validateTaskOneChoice(CreateTaskDTO createTaskDTO){
-        if (createTaskDTO.options().size() < 2 || createTaskDTO.options().size() > 5)
+    public void validateTaskOneChoice(CreateTaskDTO createTaskDTO, boolean isMultipleChoice){
+        int minOption = isMultipleChoice ? 3 : 2;
+        if (createTaskDTO.options().size() < minOption || createTaskDTO.options().size() > 5)
             throw new DataIntegrityException("Adicione de 2 a 5 alternativas.");
 
-
         List<TaskOptionDTO> optionsChoice = createTaskDTO.options().stream().filter(TaskOptionDTO::isCorrect).toList();
+
+
+        if (isMultipleChoice){
+            if (optionsChoice.size()<= 1)
+                throw new DataIntegrityException("Assine mais de uma alternativa");
+
+            List<TaskOptionDTO> optionsNotChoice = createTaskDTO.options().stream().filter(t -> !t.isCorrect()).toList();
+            if (optionsNotChoice.isEmpty())
+                throw new DataIntegrityException("Pelo menos uma alternativa precisa ser Incorreta! ");
+
+        }
+
         if (optionsChoice.size() > 1)
             throw new DataIntegrityException("Assine apenas uma opção como correta.");
 
+        verifyDuplicateOptions(createTaskDTO);
+
+    }
+
+
+    private void verifyDuplicateOptions(CreateTaskDTO createTaskDTO){
         for (int i = 0; i < createTaskDTO.options().size(); i++) {
             TaskOptionDTO taskOptionI = createTaskDTO.options().get(i);
             for (int j = i+1; j < createTaskDTO.options().size(); j++) {
@@ -70,7 +100,6 @@ public class TaskService {
 
             }
         }
-
     }
 
 

@@ -1,4 +1,4 @@
-package br.com.alura.AluraFake.dto;
+package br.com.alura.AluraFake.dto.course;
 
 import br.com.alura.AluraFake.domain.enums.CourseStatus;
 import br.com.alura.AluraFake.domain.Course;

@@ -8,6 +8,7 @@ public class TaskController {
 
     @PostMapping("/task/new/opentext")
     public ResponseEntity newOpenTextExercise() {
+
         return ResponseEntity.ok().build();
     }
 

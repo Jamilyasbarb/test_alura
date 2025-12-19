@@ -4,7 +4,7 @@ import br.com.alura.AluraFake.controllers.CourseController;
 import br.com.alura.AluraFake.domain.Course;
 import br.com.alura.AluraFake.domain.User;
 import br.com.alura.AluraFake.domain.enums.Role;
-import br.com.alura.AluraFake.dto.NewCourseDTO;
+import br.com.alura.AluraFake.dto.course.NewCourseDTO;
 import br.com.alura.AluraFake.repositories.CourseRepository;
 import br.com.alura.AluraFake.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;

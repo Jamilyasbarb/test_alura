@@ -1,7 +1,7 @@
-CREATE TABLE Task_Options (
+CREATE TABLE TaskOptions (
     id BIGINT NOT NULL AUTO_INCREMENT,
     option_text VARCHAR(255) NOT NULL,
-    is_correct TINYINT(1) NOT NULL,
+    isCorrect TINYINT(1) NOT NULL,
     task_id BIGINT NOT NULL,
 
     PRIMARY KEY (id),

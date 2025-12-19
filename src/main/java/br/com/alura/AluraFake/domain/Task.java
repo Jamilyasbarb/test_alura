@@ -1,5 +1,6 @@
 package br.com.alura.AluraFake.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
@@ -23,18 +25,17 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
-    //    @OneToMany(mappedBy = "task")
-//    private List<TaskOptions> taskOptions;
+    @OneToMany(mappedBy = "task", cascade = CascadeType.PERSIST)
+    private List<TaskOptions> taskOptions;
 
 
     public Task() {
     }
 
-    public Task(Long id, String statement, Integer order, List<TaskOptions> taskOptions, Course course) {
+    public Task(Long id, String statement, Integer order, Course course) {
         this.id = id;
         this.statement = statement;
         this.order = order;
-//        this.taskOptions = taskOptions;
         this.course = course;
     }
 
@@ -62,13 +63,13 @@ public class Task {
         this.order = order;
     }
 
-//    public List<TaskOptions> getTaskOptions() {
-//        return taskOptions;
-//    }
-//
-//    public void setTaskOptions(List<TaskOptions> taskOptions) {
-//        this.taskOptions = taskOptions;
-//    }
+    public List<TaskOptions> getTaskOptions() {
+        return taskOptions;
+    }
+
+    public void setTaskOptions(List<TaskOptions> taskOptions) {
+        this.taskOptions = taskOptions;
+    }
 
     public Course getCourse() {
         return course;

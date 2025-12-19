@@ -13,7 +13,6 @@ public class TaskMapper {
                 null,
                 createTaskDTO.statement(),
                 createTaskDTO.order(),
-                null,
                 course
         );
     }

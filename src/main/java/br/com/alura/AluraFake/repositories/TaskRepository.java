@@ -42,5 +42,12 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     )
     Long findLastTaskId();
 
+    @Query("""
+            SELECT COUNT(DISTINCT t.type) = :totalTypes
+            FROM Task t WHERE t.course.id = :courseId
+            AND t.type IN (:types)
+            """)
+    boolean verifyTypeOfTasksByCourseId(Long courseId, Integer totalTypes, List<Integer> types);
+
 
 }

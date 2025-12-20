@@ -17,6 +17,7 @@ public class Course {
     private String description;
     @ManyToOne
     private User instructor;
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private CourseStatus courseStatus;
     private LocalDateTime publishedAt;
@@ -62,5 +63,9 @@ public class Course {
 
     public LocalDateTime getPublishedAt() {
         return publishedAt;
+    }
+
+    public void setPublishedAt(LocalDateTime publishedAt) {
+        this.publishedAt = publishedAt;
     }
 }

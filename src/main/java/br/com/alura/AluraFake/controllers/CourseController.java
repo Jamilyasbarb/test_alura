@@ -20,16 +20,15 @@ import java.util.*;
 @RequestMapping("/course")
 public class CourseController {
 
-    @Autowired
-    private CourseService courseService;
-
+    private final CourseService courseService;
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public CourseController(CourseRepository courseRepository, UserRepository userRepository){
+    public CourseController(CourseRepository courseRepository, UserRepository userRepository, CourseService courseService){
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
+        this.courseService = courseService;
     }
 
     @Transactional

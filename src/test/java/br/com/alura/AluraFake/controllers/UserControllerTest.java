@@ -1,6 +1,5 @@
-package br.com.alura.AluraFake.user;
+package br.com.alura.AluraFake.controllers;
 
-import br.com.alura.AluraFake.controllers.UserController;
 import br.com.alura.AluraFake.domain.User;
 import br.com.alura.AluraFake.domain.enums.Role;
 import br.com.alura.AluraFake.dto.NewUserDTO;

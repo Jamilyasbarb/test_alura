@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
+@RequestMapping("/course")
 public class CourseController {
 
     @Autowired
@@ -32,7 +33,7 @@ public class CourseController {
     }
 
     @Transactional
-    @PostMapping("/course/new")
+    @PostMapping("/new")
     public ResponseEntity createCourse(@Valid @RequestBody NewCourseDTO newCourse) {
 
         //Caso implemente o bonus, pegue o instrutor logado
@@ -51,7 +52,7 @@ public class CourseController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/course/all")
+    @GetMapping("/all")
     public ResponseEntity<List<CourseListItemDTO>> createCourse() {
         List<CourseListItemDTO> courses = courseRepository.findAll().stream()
                 .map(CourseListItemDTO::new)
@@ -59,9 +60,14 @@ public class CourseController {
         return ResponseEntity.ok(courses);
     }
 
-    @PostMapping("/course/{id}/publish")
+    @PostMapping("/{id}/publish")
     public ResponseEntity createCourse(@PathVariable("id") Long id) {
         return ResponseEntity.ok().body(courseService.publish(id));
+    }
+
+    @GetMapping("/{instructorId}/list")
+    public ResponseEntity findCoursesByInstructor(@PathVariable("instructorId") Long instructorId) {
+        return ResponseEntity.ok().body(courseService.findByInstructor(instructorId));
     }
 
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class TaskService {
@@ -35,10 +36,10 @@ public class TaskService {
         return taskRepository.save(taskMapper.toEntityFromCreateDTO(createTaskDTO, course));
     }
 
-    public Task createTaskOneChoice(CreateTaskDTO createTaskDTO){
+    public Task createTaskOneChoice(CreateTaskDTO createTaskDTO, boolean isMultipleChoice){
         Course course = courseRepository.findById(createTaskDTO.courseId()).orElseThrow(() -> new ObjectNotFoundException(Course.class));
         validateDefault(createTaskDTO, course);
-        validateTaskOneChoice(createTaskDTO, false);
+        validateTaskOneChoice(createTaskDTO, isMultipleChoice);
         Task task = taskMapper.toEntityFromCreateDTO(createTaskDTO, course);
 
         if (Objects.nonNull(createTaskDTO.options())) {
@@ -49,6 +50,7 @@ public class TaskService {
             options.forEach(option -> option.setTask(task));
             task.setTaskOptions(options);
         }
+        verifyAndChangeOrder(createTaskDTO.order());
         return taskRepository.save(task);
     }
 
@@ -56,7 +58,7 @@ public class TaskService {
         if (!course.getStatus().equals(CourseStatus.BUILDING))
             throw new DataIntegrityException("Não foi possível adicionar a tarefa pois o status do Curso não está BUILDING");
 
-
+        //todo: remover acentos e letra maiusculas antes da comparacao
         List<Task> tasks = taskRepository.findTaskAlreadyUtilizedByCourseId(createTaskDTO.statement(), createTaskDTO.courseId());
         if (!tasks.isEmpty()){
             throw new DataIntegrityException("Já existe uma Tarefa com esse enunciado!");
@@ -64,7 +66,7 @@ public class TaskService {
     }
 
     public void validateTaskOneChoice(CreateTaskDTO createTaskDTO, boolean isMultipleChoice){
-        int minOption = isMultipleChoice ? 3 : 2;
+        int minOption = isMultipleChoice ? 3 : 2; //todo: colocar em contants
         if (createTaskDTO.options().size() < minOption || createTaskDTO.options().size() > 5)
             throw new DataIntegrityException("Adicione de 2 a 5 alternativas.");
 
@@ -73,19 +75,18 @@ public class TaskService {
 
         if (isMultipleChoice){
             if (optionsChoice.size()<= 1)
-                throw new DataIntegrityException("Assine mais de uma alternativa");
+                throw new DataIntegrityException("Assine duas ou mais alternativas");
 
             List<TaskOptionDTO> optionsNotChoice = createTaskDTO.options().stream().filter(t -> !t.isCorrect()).toList();
             if (optionsNotChoice.isEmpty())
                 throw new DataIntegrityException("Pelo menos uma alternativa precisa ser Incorreta! ");
 
+        }else{
+            if (optionsChoice.size() > 1)
+                throw new DataIntegrityException("Assine apenas uma opção como correta.");
         }
 
-        if (optionsChoice.size() > 1)
-            throw new DataIntegrityException("Assine apenas uma opção como correta.");
-
         verifyDuplicateOptions(createTaskDTO);
-
     }
 
 
@@ -100,6 +101,27 @@ public class TaskService {
 
             }
         }
+    }
+
+    public void verifyAndChangeOrder(Integer orderNumber){
+       Optional<Task> task =  taskRepository.findByOrder(orderNumber);
+
+       if (task.isPresent()){
+           taskRepository.updateOrder(orderNumber);
+           return;
+       }
+
+        boolean noTasksFound = taskRepository.existsAnyTask() == 0;
+
+        if (noTasksFound && !orderNumber.equals(1))
+            throw new DataIntegrityException("A ordem deve começar do número 1!");
+
+        long nextOrderNumber = taskRepository.findLastTaskId() + 1;
+
+        if (nextOrderNumber != orderNumber)
+            throw new DataIntegrityException("Não é permitido adicionar uma atividade com ordem " + orderNumber +
+                    " pois ainda não existem atividades com ordens " + nextOrderNumber + "!");
+
     }
 
 

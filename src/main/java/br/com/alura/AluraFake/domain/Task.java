@@ -1,5 +1,6 @@
 package br.com.alura.AluraFake.domain;
 
+import br.com.alura.AluraFake.domain.enums.TaskType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,16 +28,18 @@ public class Task {
     private Course course;
     @OneToMany(mappedBy = "task", cascade = CascadeType.PERSIST)
     private List<TaskOptions> taskOptions;
+    private Integer type;
 
 
     public Task() {
     }
 
-    public Task(Long id, String statement, Integer order, Course course) {
+    public Task(Long id, String statement, Integer order, Course course, TaskType type) {
         this.id = id;
         this.statement = statement;
         this.order = order;
         this.course = course;
+        this.type = type.getCode();
     }
 
     public Long getId() {
@@ -77,5 +80,13 @@ public class Task {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

@@ -2,6 +2,7 @@ CREATE TABLE Task (
     id BIGINT NOT NULL AUTO_INCREMENT,
     statement TEXT NOT NULL,
     order_number INT,
+    type INT,
     course_id BIGINT,
     PRIMARY KEY (id),
     FOREIGN KEY (course_id) REFERENCES Course(id)

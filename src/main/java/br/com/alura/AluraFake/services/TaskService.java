@@ -4,6 +4,7 @@ import br.com.alura.AluraFake.domain.Course;
 import br.com.alura.AluraFake.domain.Task;
 import br.com.alura.AluraFake.domain.TaskOptions;
 import br.com.alura.AluraFake.domain.enums.CourseStatus;
+import br.com.alura.AluraFake.domain.enums.TaskType;
 import br.com.alura.AluraFake.dto.TaskOptionDTO;
 import br.com.alura.AluraFake.dto.task.CreateTaskDTO;
 import br.com.alura.AluraFake.exception.DataIntegrityException;
@@ -33,14 +34,14 @@ public class TaskService {
     public Task createTask(CreateTaskDTO createTaskDTO){
         Course course = courseRepository.findById(createTaskDTO.courseId()).orElseThrow(() -> new ObjectNotFoundException(Course.class));
         validateDefault(createTaskDTO, course);
-        return taskRepository.save(taskMapper.toEntityFromCreateDTO(createTaskDTO, course));
+        return taskRepository.save(taskMapper.toEntityFromCreateDTO(createTaskDTO, course, TaskType.OPEN_TEXT));
     }
 
     public Task createTaskOneChoice(CreateTaskDTO createTaskDTO, boolean isMultipleChoice){
         Course course = courseRepository.findById(createTaskDTO.courseId()).orElseThrow(() -> new ObjectNotFoundException(Course.class));
         validateDefault(createTaskDTO, course);
         validateTaskOneChoice(createTaskDTO, isMultipleChoice);
-        Task task = taskMapper.toEntityFromCreateDTO(createTaskDTO, course);
+        Task task = taskMapper.toEntityFromCreateDTO(createTaskDTO, course, isMultipleChoice ? TaskType.MULTIPLE_CHOICE : TaskType.SINGLE_CHOICE);
 
         if (Objects.nonNull(createTaskDTO.options())) {
             List<TaskOptions> options = createTaskDTO.options().stream()
@@ -50,7 +51,6 @@ public class TaskService {
             options.forEach(option -> option.setTask(task));
             task.setTaskOptions(options);
         }
-        verifyAndChangeOrder(createTaskDTO.order());
         return taskRepository.save(task);
     }
 
@@ -63,6 +63,7 @@ public class TaskService {
         if (!tasks.isEmpty()){
             throw new DataIntegrityException("Já existe uma Tarefa com esse enunciado!");
         }
+        verifyAndChangeOrder(createTaskDTO.order());
     }
 
     public void validateTaskOneChoice(CreateTaskDTO createTaskDTO, boolean isMultipleChoice){
@@ -112,12 +113,14 @@ public class TaskService {
        }
 
         boolean noTasksFound = taskRepository.existsAnyTask() == 0;
+        if (noTasksFound){
+            if (!orderNumber.equals(1))
+                throw new DataIntegrityException("A ordem deve começar do número 1!");
 
-        if (noTasksFound && !orderNumber.equals(1))
-            throw new DataIntegrityException("A ordem deve começar do número 1!");
+            return;
+        }
 
         long nextOrderNumber = taskRepository.findLastTaskId() + 1;
-
         if (nextOrderNumber != orderNumber)
             throw new DataIntegrityException("Não é permitido adicionar uma atividade com ordem " + orderNumber +
                     " pois ainda não existem atividades com ordens " + nextOrderNumber + "!");

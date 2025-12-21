@@ -17,7 +17,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByCourseId(Long courseId);
 
     @Query("""
-            SELECT t FROM Task t WHERE t.course.id = :courseId AND t.statement = :statement
+            	SELECT * FROM Task t WHERE t.course_id = :courseId  AND t.statement COLLATE utf8mb4_0900_ai_ci = :statement;
             """)
     List<Task> findTaskAlreadyUtilizedByCourseId(String statement, Long courseId);
 

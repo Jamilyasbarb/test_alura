@@ -1,4 +1,4 @@
-package br.com.alura.AluraFake.dto;
+package br.com.alura.AluraFake.dto.task;
 
 import jakarta.validation.constraints.Size;
 

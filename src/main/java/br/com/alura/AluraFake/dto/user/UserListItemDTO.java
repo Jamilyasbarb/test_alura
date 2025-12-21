@@ -1,4 +1,4 @@
-package br.com.alura.AluraFake.dto;
+package br.com.alura.AluraFake.dto.user;
 
 import br.com.alura.AluraFake.domain.User;
 import br.com.alura.AluraFake.domain.enums.Role;

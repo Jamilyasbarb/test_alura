@@ -2,7 +2,7 @@ package br.com.alura.AluraFake.services;
 
 import br.com.alura.AluraFake.domain.Course;
 import br.com.alura.AluraFake.domain.Task;
-import br.com.alura.AluraFake.domain.TaskOptions;
+import br.com.alura.AluraFake.domain.TaskOption;
 import br.com.alura.AluraFake.domain.enums.CourseStatus;
 import br.com.alura.AluraFake.domain.enums.TaskType;
 import br.com.alura.AluraFake.dto.TaskOptionDTO;
@@ -81,9 +81,9 @@ class TaskServiceTest {
                 new CreateTaskDTO(1L, "Enunciado", 1, List.of(taskOptionDTO1, taskOptionDTO2, taskOptionDTO3));
 
 
-        TaskOptions taskOption1 = new TaskOptions(1L,"Alternativa 1", true);
-        TaskOptions taskOption2 = new TaskOptions( 2L,"Alternativa 2", false);
-        TaskOptions taskOption3 = new TaskOptions(3L, "Alternativa 3", false );
+        TaskOption taskOption1 = new TaskOption(1L,"Alternativa 1", true);
+        TaskOption taskOption2 = new TaskOption( 2L,"Alternativa 2", false);
+        TaskOption taskOption3 = new TaskOption(3L, "Alternativa 3", false );
 
         Task mappedTask = new Task();
         mappedTask.setStatement("Enunciado");
@@ -113,9 +113,9 @@ class TaskServiceTest {
                 new CreateTaskDTO(1L, "Enunciado", 1, List.of(taskOptionDTO1, taskOptionDTO2, taskOptionDTO3));
 
 
-        TaskOptions taskOption1 = new TaskOptions(1L,"Alternativa 1", true);
-        TaskOptions taskOption2 = new TaskOptions( 2L,"Alternativa 2", true);
-        TaskOptions taskOption3 = new TaskOptions(3L, "Alternativa 3", false );
+        TaskOption taskOption1 = new TaskOption(1L,"Alternativa 1", true);
+        TaskOption taskOption2 = new TaskOption( 2L,"Alternativa 2", true);
+        TaskOption taskOption3 = new TaskOption(3L, "Alternativa 3", false );
 
         Task mappedTask = new Task();
         mappedTask.setStatement("Enunciado");

@@ -10,7 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class TaskOptions {
+public class TaskOption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,16 +22,16 @@ public class TaskOptions {
     @JoinColumn(name = "task_id")
     private Task task;
 
-    public TaskOptions() {
+    public TaskOption() {
     }
 
-    public TaskOptions(Long id, String alternative, boolean isCorrect) {
+    public TaskOption(Long id, String alternative, boolean isCorrect) {
         this.id = id;
         this.alternative = alternative;
         this.isCorrect = isCorrect;
     }
 
-    public TaskOptions(TaskOptionDTO taskOptionDTO) {
+    public TaskOption(TaskOptionDTO taskOptionDTO) {
         this.alternative = taskOptionDTO.option();
         this.isCorrect = taskOptionDTO.isCorrect();
     }

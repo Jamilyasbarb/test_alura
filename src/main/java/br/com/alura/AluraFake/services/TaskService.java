@@ -2,7 +2,7 @@ package br.com.alura.AluraFake.services;
 
 import br.com.alura.AluraFake.domain.Course;
 import br.com.alura.AluraFake.domain.Task;
-import br.com.alura.AluraFake.domain.TaskOptions;
+import br.com.alura.AluraFake.domain.TaskOption;
 import br.com.alura.AluraFake.domain.enums.CourseStatus;
 import br.com.alura.AluraFake.domain.enums.TaskType;
 import br.com.alura.AluraFake.dto.TaskOptionDTO;
@@ -44,8 +44,8 @@ public class TaskService {
         Task task = taskMapper.toEntityFromCreateDTO(createTaskDTO, course, isMultipleChoice ? TaskType.MULTIPLE_CHOICE : TaskType.SINGLE_CHOICE);
 
         if (Objects.nonNull(createTaskDTO.options())) {
-            List<TaskOptions> options = createTaskDTO.options().stream()
-                    .map(TaskOptions::new)
+            List<TaskOption> options = createTaskDTO.options().stream()
+                    .map(TaskOption::new)
                     .toList();
 
             options.forEach(option -> option.setTask(task));

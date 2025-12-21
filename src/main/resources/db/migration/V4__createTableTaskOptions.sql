@@ -1,4 +1,4 @@
-CREATE TABLE TaskOptions (
+CREATE TABLE TaskOption (
     id BIGINT NOT NULL AUTO_INCREMENT,
     option_text VARCHAR(255) NOT NULL,
     isCorrect TINYINT(1) NOT NULL,

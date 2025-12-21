@@ -27,7 +27,7 @@ public class Task {
     @JoinColumn(name = "course_id")
     private Course course;
     @OneToMany(mappedBy = "task", cascade = CascadeType.PERSIST)
-    private List<TaskOptions> taskOptions;
+    private List<TaskOption> taskOptions;
     private Integer type;
 
 
@@ -66,11 +66,11 @@ public class Task {
         this.order = order;
     }
 
-    public List<TaskOptions> getTaskOptions() {
+    public List<TaskOption> getTaskOptions() {
         return taskOptions;
     }
 
-    public void setTaskOptions(List<TaskOptions> taskOptions) {
+    public void setTaskOptions(List<TaskOption> taskOptions) {
         this.taskOptions = taskOptions;
     }
 

@@ -2,8 +2,11 @@ package br.com.alura.AluraFake.controllers;
 
 import br.com.alura.AluraFake.domain.Course;
 import br.com.alura.AluraFake.domain.User;
+import br.com.alura.AluraFake.domain.enums.CourseStatus;
 import br.com.alura.AluraFake.domain.enums.Role;
 import br.com.alura.AluraFake.dto.course.NewCourseDTO;
+import br.com.alura.AluraFake.exception.DataIntegrityException;
+import br.com.alura.AluraFake.exception.ObjectNotFoundException;
 import br.com.alura.AluraFake.repositories.CourseRepository;
 import br.com.alura.AluraFake.repositories.UserRepository;
 import br.com.alura.AluraFake.services.CourseService;
@@ -120,5 +123,46 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$[2].title").value("Spring"))
                 .andExpect(jsonPath("$[2].description").value("Curso de spring"));
     }
+
+    @Test
+    void shouldPublishCourseSuccessfully() throws Exception {
+        Long courseId = 1L;
+
+        Course course = new Course();
+        course.setId(courseId);
+        course.setStatus(CourseStatus.PUBLISHED);
+
+        when(courseService.publish(courseId))
+                .thenReturn(course);
+
+        mockMvc.perform(post("/course/{id}/publish", courseId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(courseService).publish(courseId);
+    }
+
+    @Test
+    void shouldReturnClientErrorWhenServiceThrowsException() throws Exception {
+        Long courseId = 1L;
+
+        when(courseService.publish(courseId))
+                .thenThrow(new DataIntegrityException("Erro"));
+
+        mockMvc.perform(post("/course/{id}/publish", courseId))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    void shouldReturnClientErrorWhenServiceThrowsObjectNotFound() throws Exception {
+        Long courseId = 1L;
+
+        when(courseService.publish(courseId))
+                .thenThrow(new ObjectNotFoundException("Erro"));
+
+        mockMvc.perform(post("/course/{id}/publish", courseId))
+                .andExpect(status().is4xxClientError());
+    }
+
 
 }

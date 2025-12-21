@@ -58,6 +58,10 @@ public class User {
         return role;
     }
 
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     public boolean isInstructor() {
         return Role.INSTRUCTOR.equals(this.role);
     }

@@ -30,11 +30,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             """, nativeQuery = true)
     void updateOrder(Integer orderNumber);
 
-    @Query(
-            value = "SELECT EXISTS (SELECT 1 FROM Task)",
-            nativeQuery = true
-    )
-    int existsAnyTask();
+    @Query("SELECT COUNT(t) > 0 FROM Task t")
+    boolean existsAnyTask();
 
     @Query(
             value = "SELECT MAX(id) FROM Task",

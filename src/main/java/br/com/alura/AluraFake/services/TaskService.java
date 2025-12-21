@@ -13,6 +13,7 @@ import br.com.alura.AluraFake.exception.ObjectNotFoundException;
 import br.com.alura.AluraFake.mappers.TaskMapper;
 import br.com.alura.AluraFake.repositories.CourseRepository;
 import br.com.alura.AluraFake.repositories.TaskRepository;
+import br.com.alura.AluraFake.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +61,6 @@ public class TaskService {
         if (!course.getStatus().equals(CourseStatus.BUILDING))
             throw new DataIntegrityException("Não foi possível adicionar a tarefa pois o status do Curso não está BUILDING");
 
-        //todo: remover acentos e letra maiusculas antes da comparacao
         List<Task> tasks = taskRepository.findTaskAlreadyUtilizedByCourseId(createTaskDTO.statement(), createTaskDTO.courseId());
         if (!tasks.isEmpty()){
             throw new DataIntegrityException("Já existe uma Tarefa com esse enunciado!");
@@ -69,7 +69,7 @@ public class TaskService {
     }
 
     public void validateTaskOneChoice(CreateTaskDTO createTaskDTO, boolean isMultipleChoice){
-        int minOption = isMultipleChoice ? 3 : 2; //todo: colocar em contants
+        int minOption = isMultipleChoice ? Constants.MINIMUM_OPTIONS_MULTIPLE_CHOICE : Constants.MINIMUM_OPTIONS_SINGLE_CHOICE;
         if (createTaskDTO.options().size() < minOption || createTaskDTO.options().size() > 5)
             throw new DataIntegrityException("Adicione de 2 a 5 alternativas.");
 
@@ -77,7 +77,7 @@ public class TaskService {
 
 
         if (isMultipleChoice){
-            if (optionsChoice.size()<= 1)
+            if (optionsChoice.size() < Constants.MINIMUM_CHOICES_ALLOWED_MULTIPLE_CHOICE)
                 throw new DataIntegrityException("Assine duas ou mais alternativas");
 
             List<TaskOptionDTO> optionsNotChoice = createTaskDTO.options().stream().filter(t -> !t.isCorrect()).toList();
@@ -85,7 +85,7 @@ public class TaskService {
                 throw new DataIntegrityException("Pelo menos uma alternativa precisa ser Incorreta! ");
 
         }else{
-            if (optionsChoice.size() > 1)
+            if (optionsChoice.size() > Constants.MAXIMUM_CHOICES_ALLOWED_SINGLE_CHOICE)
                 throw new DataIntegrityException("Assine apenas uma opção como correta.");
         }
 
@@ -116,8 +116,8 @@ public class TaskService {
 
         boolean noTasksFound = !taskRepository.existsAnyTask();
         if (noTasksFound){
-            if (!orderNumber.equals(1))
-                throw new DataIntegrityException("A ordem deve começar do número 1!");
+            if (!orderNumber.equals(Constants.INITIAL_ORDER))
+                throw new DataIntegrityException("A ordem deve começar do número " + Constants.INITIAL_ORDER + "!");
 
             return;
         }

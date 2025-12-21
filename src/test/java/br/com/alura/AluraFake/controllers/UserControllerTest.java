@@ -2,7 +2,7 @@ package br.com.alura.AluraFake.controllers;
 
 import br.com.alura.AluraFake.domain.User;
 import br.com.alura.AluraFake.domain.enums.Role;
-import br.com.alura.AluraFake.dto.NewUserDTO;
+import br.com.alura.AluraFake.dto.user.NewUserDTO;
 import br.com.alura.AluraFake.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

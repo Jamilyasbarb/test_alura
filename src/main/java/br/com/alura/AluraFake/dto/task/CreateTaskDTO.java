@@ -1,6 +1,5 @@
 package br.com.alura.AluraFake.dto.task;
 
-import br.com.alura.AluraFake.dto.TaskOptionDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 

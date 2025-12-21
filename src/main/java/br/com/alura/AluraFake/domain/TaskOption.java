@@ -1,6 +1,6 @@
 package br.com.alura.AluraFake.domain;
 
-import br.com.alura.AluraFake.dto.TaskOptionDTO;
+import br.com.alura.AluraFake.dto.task.TaskOptionDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

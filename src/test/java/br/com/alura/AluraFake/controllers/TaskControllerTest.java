@@ -4,8 +4,11 @@ import br.com.alura.AluraFake.domain.Course;
 import br.com.alura.AluraFake.domain.Task;
 import br.com.alura.AluraFake.domain.TaskOption;
 import br.com.alura.AluraFake.domain.enums.TaskType;
-import br.com.alura.AluraFake.dto.TaskOptionDTO;
+import br.com.alura.AluraFake.dto.course.CourseDTO;
+import br.com.alura.AluraFake.dto.task.TaskDTO;
+import br.com.alura.AluraFake.dto.task.TaskOptionDTO;
 import br.com.alura.AluraFake.dto.task.CreateTaskDTO;
+import br.com.alura.AluraFake.dto.user.UserDTO;
 import br.com.alura.AluraFake.exception.DataIntegrityException;
 import br.com.alura.AluraFake.exception.ObjectNotFoundException;
 import br.com.alura.AluraFake.services.TaskService;
@@ -61,10 +64,12 @@ class TaskControllerTest {
 
         TaskOption taskOption1 = new TaskOption(1L, "Alternativa 1", false);
         TaskOption taskOption2 = new TaskOption(1L, "Alternativa 2", true);
+        TaskDTO taskDTO = new TaskDTO(task.getId(), task.getStatement(), task.getOrder(),
+                new CourseDTO(1L, "Curso1", new UserDTO(1L, "Jamily")), List.of());
 
         task.setTaskOptions(List.of(taskOption1, taskOption2));
 
-        doReturn(task).when(taskService).createTaskOneChoice(any(CreateTaskDTO.class), anyBoolean());
+        doReturn(taskDTO).when(taskService).createTaskOneChoice(any(CreateTaskDTO.class), anyBoolean());
 
         mockMvc.perform(post("/task/new/singlechoice")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -79,10 +84,12 @@ class TaskControllerTest {
 
         TaskOption taskOption1 = new TaskOption(1L, "Alternativa 1", false);
         TaskOption taskOption2 = new TaskOption(1L, "Alternativa 2", true);
+        TaskDTO taskDTO = new TaskDTO(task.getId(), task.getStatement(), task.getOrder(),
+                new CourseDTO(1L, "Curso1", new UserDTO(1L, "Jamily")), List.of());
 
         task.setTaskOptions(List.of(taskOption1, taskOption2));
 
-        doReturn(task).when(taskService).createTaskOneChoice(any(CreateTaskDTO.class), anyBoolean());
+        doReturn(taskDTO).when(taskService).createTaskOneChoice(any(CreateTaskDTO.class), anyBoolean());
 
         mockMvc.perform(post("/task/new/multiplechoice")
                         .contentType(MediaType.APPLICATION_JSON)

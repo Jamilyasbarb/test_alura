@@ -5,8 +5,11 @@ import br.com.alura.AluraFake.domain.Task;
 import br.com.alura.AluraFake.domain.TaskOption;
 import br.com.alura.AluraFake.domain.enums.CourseStatus;
 import br.com.alura.AluraFake.domain.enums.TaskType;
-import br.com.alura.AluraFake.dto.TaskOptionDTO;
+import br.com.alura.AluraFake.dto.course.CourseDTO;
+import br.com.alura.AluraFake.dto.task.TaskDTO;
+import br.com.alura.AluraFake.dto.task.TaskOptionDTO;
 import br.com.alura.AluraFake.dto.task.CreateTaskDTO;
+import br.com.alura.AluraFake.dto.user.UserDTO;
 import br.com.alura.AluraFake.exception.DataIntegrityException;
 import br.com.alura.AluraFake.exception.ObjectNotFoundException;
 import br.com.alura.AluraFake.mappers.TaskMapper;
@@ -88,15 +91,20 @@ class TaskServiceTest {
         Task mappedTask = new Task();
         mappedTask.setStatement("Enunciado");
         mappedTask.setTaskOptions(List.of(taskOption1, taskOption2, taskOption3));
+        TaskDTO taskDTO = new TaskDTO(mappedTask.getId(), mappedTask.getStatement(), mappedTask.getOrder(),
+                new CourseDTO(course.getId(), course.getTitle(), new UserDTO(1L, "Jamily")), List.of(taskOptionDTO1, taskOptionDTO2, taskOptionDTO3));
+
+
 
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
         when(taskRepository.findTaskAlreadyUtilizedByCourseId("Enunciado", 1L)).thenReturn(List.of());
         when(taskMapper.toEntityFromCreateDTO(createTaskDTO, course, TaskType.SINGLE_CHOICE)).thenReturn(mappedTask);
         when(taskRepository.save(mappedTask)).thenReturn(mappedTask);
+        when(taskMapper.toTaskDTOFromEntity(mappedTask)).thenReturn(taskDTO);
 
-        Task savedTask = taskService.createTaskOneChoice(createTaskDTO, false);
+        TaskDTO savedTask = taskService.createTaskOneChoice(createTaskDTO, false);
 
-        assertEquals("Enunciado", savedTask.getStatement());
+        assertEquals("Enunciado", savedTask.statement());
         verify(taskRepository, times(1)).save(mappedTask);
     }
 
@@ -121,21 +129,27 @@ class TaskServiceTest {
         mappedTask.setStatement("Enunciado");
         mappedTask.setTaskOptions(List.of(taskOption1, taskOption2, taskOption3));
 
+        TaskDTO taskDTO = new TaskDTO(mappedTask.getId(), mappedTask.getStatement(), mappedTask.getOrder(),
+                new CourseDTO(course.getId(), course.getTitle(), new UserDTO(1L, "Jamily")), List.of(taskOptionDTO1, taskOptionDTO2, taskOptionDTO3));
+
+
+
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
         when(taskRepository.findTaskAlreadyUtilizedByCourseId("Enunciado", 1L)).thenReturn(List.of());
         when(taskMapper.toEntityFromCreateDTO(createTaskDTO, course, TaskType.MULTIPLE_CHOICE)).thenReturn(mappedTask);
         when(taskRepository.save(mappedTask)).thenReturn(mappedTask);
+        when(taskMapper.toTaskDTOFromEntity(mappedTask)).thenReturn(taskDTO);
 
-        Task savedTask = taskService.createTaskOneChoice(createTaskDTO, true);
+        TaskDTO savedTask = taskService.createTaskOneChoice(createTaskDTO, true);
 
-        assertEquals("Enunciado", savedTask.getStatement());
+        assertEquals("Enunciado", savedTask.statement());
         verify(taskRepository, times(1)).save(mappedTask);
     }
 
     @Test
     void shouldThrowException_whenTheFirstTaskAddWithOrderDifferentThenOne(){
         when(taskRepository.findByOrder(1)).thenReturn(Optional.empty());
-        when(taskRepository.existsAnyTask()).thenReturn(0);
+        when(taskRepository.existsAnyTask()).thenReturn(false);
 
         DataIntegrityException exception = assertThrows(DataIntegrityException.class, () -> taskService.verifyAndChangeOrder(2));
         assertEquals("A ordem deve começar do número 1!", exception.getMessage());
@@ -144,7 +158,7 @@ class TaskServiceTest {
     @Test
     void shouldThrowException_whenTheAddedOrderNumberDoesNotContinueTheSequenceFromThePreviousOne(){
         when(taskRepository.findByOrder(1)).thenReturn(Optional.empty());
-        when(taskRepository.existsAnyTask()).thenReturn(1);
+        when(taskRepository.existsAnyTask()).thenReturn(true);
         when(taskRepository.findLastTaskId()).thenReturn(1L);
 
         DataIntegrityException exception = assertThrows(DataIntegrityException.class, () -> taskService.verifyAndChangeOrder(3));

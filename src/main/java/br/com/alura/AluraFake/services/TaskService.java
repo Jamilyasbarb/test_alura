@@ -5,7 +5,8 @@ import br.com.alura.AluraFake.domain.Task;
 import br.com.alura.AluraFake.domain.TaskOption;
 import br.com.alura.AluraFake.domain.enums.CourseStatus;
 import br.com.alura.AluraFake.domain.enums.TaskType;
-import br.com.alura.AluraFake.dto.TaskOptionDTO;
+import br.com.alura.AluraFake.dto.task.TaskDTO;
+import br.com.alura.AluraFake.dto.task.TaskOptionDTO;
 import br.com.alura.AluraFake.dto.task.CreateTaskDTO;
 import br.com.alura.AluraFake.exception.DataIntegrityException;
 import br.com.alura.AluraFake.exception.ObjectNotFoundException;
@@ -37,7 +38,7 @@ public class TaskService {
         return taskRepository.save(taskMapper.toEntityFromCreateDTO(createTaskDTO, course, TaskType.OPEN_TEXT));
     }
 
-    public Task createTaskOneChoice(CreateTaskDTO createTaskDTO, boolean isMultipleChoice){
+    public TaskDTO createTaskOneChoice(CreateTaskDTO createTaskDTO, boolean isMultipleChoice){
         Course course = courseRepository.findById(createTaskDTO.courseId()).orElseThrow(() -> new ObjectNotFoundException(Course.class));
         validateDefault(createTaskDTO, course);
         validateTaskOneChoice(createTaskDTO, isMultipleChoice);
@@ -51,7 +52,8 @@ public class TaskService {
             options.forEach(option -> option.setTask(task));
             task.setTaskOptions(options);
         }
-        return taskRepository.save(task);
+
+        return taskMapper.toTaskDTOFromEntity(taskRepository.save(task));
     }
 
     public void validateDefault(CreateTaskDTO createTaskDTO, Course course){
@@ -112,7 +114,7 @@ public class TaskService {
            return;
        }
 
-        boolean noTasksFound = taskRepository.existsAnyTask() == 0;
+        boolean noTasksFound = !taskRepository.existsAnyTask();
         if (noTasksFound){
             if (!orderNumber.equals(1))
                 throw new DataIntegrityException("A ordem deve começar do número 1!");

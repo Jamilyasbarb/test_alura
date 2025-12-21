@@ -2,6 +2,7 @@ package br.com.alura.AluraFake.controllers;
 
 import br.com.alura.AluraFake.domain.Task;
 import br.com.alura.AluraFake.dto.task.CreateTaskDTO;
+import br.com.alura.AluraFake.dto.task.TaskDTO;
 import br.com.alura.AluraFake.services.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +24,14 @@ public class TaskController {
     }
 
     @PostMapping("/new/singlechoice")
-    public ResponseEntity newSingleChoice(@Valid @RequestBody CreateTaskDTO createTaskDTO) {
-        Task task = taskService.createTaskOneChoice(createTaskDTO, false);
+    public ResponseEntity<TaskDTO> newSingleChoice(@Valid @RequestBody CreateTaskDTO createTaskDTO) {
+        TaskDTO task = taskService.createTaskOneChoice(createTaskDTO, false);
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
     @PostMapping("/new/multiplechoice")
     public ResponseEntity newMultipleChoice(@Valid @RequestBody CreateTaskDTO createTaskDTO) {
-        Task task = taskService.createTaskOneChoice(createTaskDTO, true);
+        TaskDTO task = taskService.createTaskOneChoice(createTaskDTO, true);
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 

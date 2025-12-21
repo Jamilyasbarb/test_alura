@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +18,12 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByCourseId(Long courseId);
 
     @Query(value = """
-            	SELECT * FROM Task t WHERE t.course_id = :courseId  AND t.statement COLLATE utf8mb4_0900_ai_ci = :statement;
-            """, nativeQuery = true)
-    List<Task> findTaskAlreadyUtilizedByCourseId(String statement, Long courseId);
+        SELECT * FROM Task
+        WHERE course_id = :courseId
+          AND UPPER(statement) = UPPER(:statement)
+    """, nativeQuery = true)
+    List<Task> findTaskAlreadyUtilizedByCourseId(@Param("statement") String statement,
+                                                 @Param("courseId") Long courseId);
 
     Optional<Task> findByOrder(Integer order);
 

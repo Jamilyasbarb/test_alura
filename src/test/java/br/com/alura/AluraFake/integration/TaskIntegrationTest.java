@@ -27,9 +27,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
 
 @SpringBootTest()
 @ActiveProfiles("test")
@@ -37,8 +43,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class TaskIntegrationTest {
 
-    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -59,6 +67,9 @@ public class TaskIntegrationTest {
 
     @BeforeEach
     void setup() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
         User jamily = new User("jamily", "jamily@alura.com.br", Role.STUDENT);
         User felipe = new User("felipe", "felipe@alura.com.br", Role.INSTRUCTOR);
         userRepository.saveAll(Arrays.asList(jamily, felipe));
@@ -73,6 +84,7 @@ public class TaskIntegrationTest {
     //openText
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldCreateOpenTextTaskSuccessfully() throws Exception {
         CreateTaskDTO dto = new CreateTaskDTO(
                 course.getId(),
@@ -97,6 +109,7 @@ public class TaskIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldFailWhenCourseNotBuilding() throws Exception {
         course.setStatus(CourseStatus.PUBLISHED);
         courseRepository.save(course);
@@ -112,6 +125,7 @@ public class TaskIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldFailWhenTaskAlreadyExists() throws Exception {
         Task existing = new Task();
         existing.setStatement("Enunciado duplicado");
@@ -130,6 +144,7 @@ public class TaskIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldFailWhenOrderIsIncorrect() throws Exception {
         CreateTaskDTO dto = new CreateTaskDTO(course.getId(), "Nova Tarefa", 4, List.of());
         String dtoJson = objectMapper.writeValueAsString(dto);
@@ -143,6 +158,7 @@ public class TaskIntegrationTest {
 
     //singleChoice
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldCreateSingleChoiceTaskSuccessfully() throws Exception {
         CreateTaskDTO dto = new CreateTaskDTO(
                 course.getId(),
@@ -234,6 +250,7 @@ public class TaskIntegrationTest {
 
     //multipleChoice
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldCreateMultipleChoiceTaskSuccessfully() throws Exception {
         CreateTaskDTO dto = new CreateTaskDTO(
                 course.getId(),

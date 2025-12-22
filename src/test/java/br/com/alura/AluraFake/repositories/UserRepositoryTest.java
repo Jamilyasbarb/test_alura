@@ -19,15 +19,15 @@ class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
-    void findByEmail__should_return_existis_user() {
+    void findByEmail__IgnoreCase__should_return_existis_user() {
         User caio = new User("Caio", "caio@alura.com.br", Role.STUDENT);
         userRepository.save(caio);
 
-        Optional<User> result = userRepository.findByEmail("caio@alura.com.br");
+        Optional<User> result = userRepository.findByEmailIgnoreCase("caio@alura.com.br");
         assertThat(result).isPresent();
         assertThat(result.get().getName()).isEqualTo("Caio");
 
-        result = userRepository.findByEmail("sergio@alura.com.br");
+        result = userRepository.findByEmailIgnoreCase("sergio@alura.com.br");
         assertThat(result).isEmpty();
     }
 

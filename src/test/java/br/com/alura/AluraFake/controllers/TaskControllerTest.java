@@ -11,14 +11,21 @@ import br.com.alura.AluraFake.dto.task.CreateTaskDTO;
 import br.com.alura.AluraFake.dto.user.UserDTO;
 import br.com.alura.AluraFake.exception.DataIntegrityException;
 import br.com.alura.AluraFake.exception.ObjectNotFoundException;
+import br.com.alura.AluraFake.security.JWTAuthenticationFilter;
+import br.com.alura.AluraFake.security.JwtService;
+import br.com.alura.AluraFake.security.UserDetailsServiceImpl;
 import br.com.alura.AluraFake.services.TaskService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
@@ -26,6 +33,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,8 +42,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(TaskController.class)
 class TaskControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext context;
 
     @MockBean
     private TaskService taskService;
@@ -42,15 +53,35 @@ class TaskControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
+
+    @MockBean
+    private JWTAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockBean
+    private JwtService jwtService;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+    }
+
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldPass_whenAllIsRightOpenText() throws Exception {
         CreateTaskDTO createTaskDTO = new CreateTaskDTO(3L, "Enunciado", 1, List.of());
         Task task = new Task(1L, "Enunciado", 1, new Course(), TaskType.OPEN_TEXT);
+        TaskDTO taskDTO = new TaskDTO(task.getId(), task.getStatement(), task.getOrder(),
+                new CourseDTO(1L, "Curso1", new UserDTO(1L, "Jamily")), List.of());
 
-        doReturn(task).when(taskService).createTask(any(CreateTaskDTO.class));
+        doReturn(taskDTO).when(taskService).createTask(any(CreateTaskDTO.class));
 
         mockMvc.perform(post("/task/new/opentext")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is2xxSuccessful());
@@ -58,6 +89,7 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldPass_whenAllIsRightSingleChoice() throws Exception {
         CreateTaskDTO createTaskDTO = new CreateTaskDTO(3L, "Enunciado", 1, List.of());
         Task task = new Task(1L, "Enunciado", 1, new Course(), TaskType.OPEN_TEXT);
@@ -72,12 +104,14 @@ class TaskControllerTest {
         doReturn(taskDTO).when(taskService).createTaskOneChoice(any(CreateTaskDTO.class), anyBoolean());
 
         mockMvc.perform(post("/task/new/singlechoice")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is2xxSuccessful());
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldPass_whenAllIsRightMultipleChoice() throws Exception {
         CreateTaskDTO createTaskDTO = new CreateTaskDTO(3L, "Enunciado", 1, List.of());
         Task task = new Task(1L, "Enunciado", 1, new Course(), TaskType.OPEN_TEXT);
@@ -92,12 +126,14 @@ class TaskControllerTest {
         doReturn(taskDTO).when(taskService).createTaskOneChoice(any(CreateTaskDTO.class), anyBoolean());
 
         mockMvc.perform(post("/task/new/multiplechoice")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is2xxSuccessful());
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldThrowException_whenObjectNotFoundOpenText() throws Exception {
         CreateTaskDTO createTaskDTO = new CreateTaskDTO(3L, "Enunciado", 1, List.of());
 
@@ -105,6 +141,7 @@ class TaskControllerTest {
                 .when(taskService).createTask(any(CreateTaskDTO.class));
 
         mockMvc.perform(post("/task/new/opentext")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is4xxClientError())
@@ -113,6 +150,7 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldThrowException_whenDataIntegrityExceptionOpenText() throws Exception {
         CreateTaskDTO createTaskDTO = new CreateTaskDTO(3L, "Enunciado", 1, List.of());
 
@@ -120,6 +158,7 @@ class TaskControllerTest {
                 .when(taskService).createTask(any(CreateTaskDTO.class));
 
         mockMvc.perform(post("/task/new/opentext")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is4xxClientError())
@@ -128,10 +167,12 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldThrowException_whenOpenTextDTOIsInvalid() throws Exception {
         CreateTaskDTO createTaskDTO = new CreateTaskDTO(3L, "E", 1, List.of());
 
         mockMvc.perform(post("/task/new/opentext")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is4xxClientError())
@@ -140,6 +181,7 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldThrowException_whenObjectNotFoundSingleChoice() throws Exception {
         CreateTaskDTO createTaskDTO = new CreateTaskDTO(3L, "Enunciado", 1, List.of());
 
@@ -147,6 +189,7 @@ class TaskControllerTest {
                 .when(taskService).createTaskOneChoice(any(CreateTaskDTO.class), anyBoolean());
 
         mockMvc.perform(post("/task/new/singlechoice")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is4xxClientError())
@@ -155,6 +198,7 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldThrowException_whenDataIntegrityExceptionSingleChoice() throws Exception {
         CreateTaskDTO createTaskDTO = new CreateTaskDTO(3L, "Enunciado", 1, List.of());
 
@@ -162,6 +206,7 @@ class TaskControllerTest {
                 .when(taskService).createTaskOneChoice(any(CreateTaskDTO.class), anyBoolean());
 
         mockMvc.perform(post("/task/new/singlechoice")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is4xxClientError())
@@ -170,12 +215,14 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldThrowException_whenSingleChoiceDTOIsInvalid() throws Exception {
         TaskOptionDTO taskOption1 = new TaskOptionDTO(false, "O");
         TaskOptionDTO taskOption2 = new TaskOptionDTO(true, "O");
         CreateTaskDTO createTaskDTO = new CreateTaskDTO(3L, "Enunciado", 1, List.of(taskOption1, taskOption2));
 
         mockMvc.perform(post("/task/new/singlechoice")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is4xxClientError())
@@ -184,6 +231,7 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldThrowException_whenObjectNotFoundMultipleChoice() throws Exception {
         CreateTaskDTO createTaskDTO = new CreateTaskDTO(3L, "Enunciado", 1, List.of());
 
@@ -191,6 +239,7 @@ class TaskControllerTest {
                 .when(taskService).createTaskOneChoice(any(CreateTaskDTO.class), anyBoolean());
 
         mockMvc.perform(post("/task/new/multiplechoice")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is4xxClientError())
@@ -199,6 +248,7 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldThrowException_whenDataIntegrityExceptionMultipleChoice() throws Exception {
         CreateTaskDTO createTaskDTO = new CreateTaskDTO(3L, "Enunciado", 1, List.of());
 
@@ -206,6 +256,7 @@ class TaskControllerTest {
                 .when(taskService).createTaskOneChoice(any(CreateTaskDTO.class), anyBoolean());
 
         mockMvc.perform(post("/task/new/multiplechoice")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is4xxClientError())
@@ -214,6 +265,7 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "paulo@alura.com.br", roles = {"INSTRUCTOR"})
     void shouldThrowException_whenMultipleChoiceDTOIsInvalid() throws Exception {
         TaskOptionDTO taskOption1 = new TaskOptionDTO(false, "O");
         TaskOptionDTO taskOption2 = new TaskOptionDTO(true, "O");
@@ -224,6 +276,7 @@ class TaskControllerTest {
 
 
         mockMvc.perform(post("/task/new/multiplechoice")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskDTO)))
                 .andExpect(status().is4xxClientError())
@@ -231,12 +284,4 @@ class TaskControllerTest {
 
     }
 
-
-    @Test
-    void newSingleChoice() {
-    }
-
-    @Test
-    void newMultipleChoice() {
-    }
 }

@@ -58,15 +58,19 @@ class TaskServiceTest {
 
         Task mappedTask = new Task();
         mappedTask.setStatement("Enunciado");
+        TaskDTO taskDTO = new TaskDTO(mappedTask.getId(), mappedTask.getStatement(), mappedTask.getOrder(),
+                new CourseDTO(course.getId(), course.getTitle(), new UserDTO(1L, "Jamily")), List.of());
 
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
         when(taskRepository.findTaskAlreadyUtilizedByCourseId("Enunciado", 1L)).thenReturn(List.of());
         when(taskMapper.toEntityFromCreateDTO(dto, course, TaskType.OPEN_TEXT)).thenReturn(mappedTask);
         when(taskRepository.save(mappedTask)).thenReturn(mappedTask);
+        when(taskMapper.toTaskDTOFromEntity(mappedTask)).thenReturn(taskDTO);
 
-        Task savedTask = taskService.createTask(dto);
+        TaskDTO savedTask = taskService.createTask(dto);
 
-        assertEquals("Enunciado", savedTask.getStatement());
+
+        assertEquals("Enunciado", savedTask.statement());
         verify(taskRepository, times(1)).save(mappedTask);
     }
 

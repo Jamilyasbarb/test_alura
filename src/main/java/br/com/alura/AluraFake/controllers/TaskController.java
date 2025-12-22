@@ -1,6 +1,5 @@
 package br.com.alura.AluraFake.controllers;
 
-import br.com.alura.AluraFake.domain.Task;
 import br.com.alura.AluraFake.dto.task.CreateTaskDTO;
 import br.com.alura.AluraFake.dto.task.TaskDTO;
 import br.com.alura.AluraFake.services.TaskService;

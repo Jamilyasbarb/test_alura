@@ -35,8 +35,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             """, nativeQuery = true)
     void updateOrder(Integer orderNumber, Long courseId);
 
-    @Query("SELECT COUNT(t) > 0 FROM Task t")
-    boolean existsAnyTask();
+    @Query("SELECT COUNT(t) > 0 FROM Task t WHERE t.course.id = :courseId")
+    boolean existsAnyTaskByCourseId(Long courseId);
 
     @Query(
             value = "SELECT MAX(order_number) FROM Task WHERE course_id = :courseId",

@@ -117,7 +117,7 @@ public class TaskService {
            return;
        }
 
-        boolean noTasksFound = !taskRepository.existsAnyTask();
+        boolean noTasksFound = !taskRepository.existsAnyTaskByCourseId(courseId);
         if (noTasksFound){
             if (!orderNumber.equals(Constants.INITIAL_ORDER))
                 throw new DataIntegrityException("A ordem deve começar do número " + Constants.INITIAL_ORDER + "!");

@@ -153,7 +153,7 @@ class TaskServiceTest {
     @Test
     void shouldThrowException_whenTheFirstTaskAddWithOrderDifferentThenOne(){
         when(taskRepository.findByOrderAndCourseId(1, 1L)).thenReturn(Optional.empty());
-        when(taskRepository.existsAnyTask()).thenReturn(false);
+        when(taskRepository.existsAnyTaskByCourseId(1L)).thenReturn(false);
 
         DataIntegrityException exception = assertThrows(DataIntegrityException.class, () -> taskService.verifyAndChangeOrder(2, 1L));
         assertEquals("A ordem deve começar do número 1!", exception.getMessage());
@@ -162,7 +162,7 @@ class TaskServiceTest {
     @Test
     void shouldThrowException_whenTheAddedOrderNumberDoesNotContinueTheSequenceFromThePreviousOne(){
         when(taskRepository.findByOrderAndCourseId(1, 1L)).thenReturn(Optional.empty());
-        when(taskRepository.existsAnyTask()).thenReturn(true);
+        when(taskRepository.existsAnyTaskByCourseId(1L)).thenReturn(true);
         when(taskRepository.findLastTaskIdByCourse(1L)).thenReturn(1L);
 
         DataIntegrityException exception = assertThrows(DataIntegrityException.class, () -> taskService.verifyAndChangeOrder(3, 1L));

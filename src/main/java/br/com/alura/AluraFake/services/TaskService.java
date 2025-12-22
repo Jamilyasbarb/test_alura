@@ -33,10 +33,12 @@ public class TaskService {
     @Autowired
     private TaskMapper taskMapper;
 
-    public Task createTask(CreateTaskDTO createTaskDTO){
+    public TaskDTO createTask(CreateTaskDTO createTaskDTO){
         Course course = courseRepository.findById(createTaskDTO.courseId()).orElseThrow(() -> new ObjectNotFoundException(Course.class));
         validateDefault(createTaskDTO, course);
-        return taskRepository.save(taskMapper.toEntityFromCreateDTO(createTaskDTO, course, TaskType.OPEN_TEXT));
+        Task task = taskRepository.save(taskMapper.toEntityFromCreateDTO(createTaskDTO, course, TaskType.OPEN_TEXT));
+        return taskMapper.toTaskDTOFromEntity(task);
+
     }
 
     public TaskDTO createTaskOneChoice(CreateTaskDTO createTaskDTO, boolean isMultipleChoice){

@@ -67,7 +67,7 @@ public class TaskService {
         if (!tasks.isEmpty()){
             throw new DataIntegrityException("Já existe uma Tarefa com esse enunciado!");
         }
-        verifyAndChangeOrder(createTaskDTO.order());
+        verifyAndChangeOrder(createTaskDTO.order(), course.getId());
     }
 
     public void validateTaskOneChoice(CreateTaskDTO createTaskDTO, boolean isMultipleChoice){
@@ -109,11 +109,11 @@ public class TaskService {
         }
     }
 
-    public void verifyAndChangeOrder(Integer orderNumber){
-       Optional<Task> task =  taskRepository.findByOrder(orderNumber);
+    public void verifyAndChangeOrder(Integer orderNumber, Long courseId){
+       Optional<Task> task =  taskRepository.findByOrderAndCourseId(orderNumber, courseId);
 
        if (task.isPresent()){
-           taskRepository.updateOrder(orderNumber);
+           taskRepository.updateOrder(orderNumber, courseId);
            return;
        }
 
@@ -125,7 +125,7 @@ public class TaskService {
             return;
         }
 
-        long nextOrderNumber = taskRepository.findLastTaskId() + 1;
+        long nextOrderNumber = taskRepository.findLastTaskIdByCourse(courseId) + 1;
         if (nextOrderNumber != orderNumber)
             throw new DataIntegrityException("Não é permitido adicionar uma atividade com ordem " + orderNumber +
                     " pois ainda não existem atividades com ordens " + nextOrderNumber + "!");

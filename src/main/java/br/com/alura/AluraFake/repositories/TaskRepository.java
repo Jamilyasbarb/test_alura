@@ -25,23 +25,24 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findTaskAlreadyUtilizedByCourseId(@Param("statement") String statement,
                                                  @Param("courseId") Long courseId);
 
-    Optional<Task> findByOrder(Integer order);
+    Optional<Task> findByOrderAndCourseId(Integer order, Long courseId);
 
     @Transactional
     @Modifying
     @Query(value = """
-            UPDATE Task SET order_number = order_number + 1 WHERE order_number >= :orderNumber
+            UPDATE Task SET order_number = order_number + 1
+            WHERE order_number >= :orderNumber AND course_id = :courseId
             """, nativeQuery = true)
-    void updateOrder(Integer orderNumber);
+    void updateOrder(Integer orderNumber, Long courseId);
 
     @Query("SELECT COUNT(t) > 0 FROM Task t")
     boolean existsAnyTask();
 
     @Query(
-            value = "SELECT MAX(id) FROM Task",
+            value = "SELECT MAX(order_number) FROM Task WHERE course_id = :courseId",
             nativeQuery = true
     )
-    Long findLastTaskId();
+    Long findLastTaskIdByCourse(@Param("courseId") Long courseId);
 
     @Query("""
             SELECT COUNT(DISTINCT t.type) = :totalTypes

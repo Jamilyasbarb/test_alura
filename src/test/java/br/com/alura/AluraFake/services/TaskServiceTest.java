@@ -152,20 +152,20 @@ class TaskServiceTest {
 
     @Test
     void shouldThrowException_whenTheFirstTaskAddWithOrderDifferentThenOne(){
-        when(taskRepository.findByOrder(1)).thenReturn(Optional.empty());
+        when(taskRepository.findByOrderAndCourseId(1, 1L)).thenReturn(Optional.empty());
         when(taskRepository.existsAnyTask()).thenReturn(false);
 
-        DataIntegrityException exception = assertThrows(DataIntegrityException.class, () -> taskService.verifyAndChangeOrder(2));
+        DataIntegrityException exception = assertThrows(DataIntegrityException.class, () -> taskService.verifyAndChangeOrder(2, 1L));
         assertEquals("A ordem deve começar do número 1!", exception.getMessage());
     }
 
     @Test
     void shouldThrowException_whenTheAddedOrderNumberDoesNotContinueTheSequenceFromThePreviousOne(){
-        when(taskRepository.findByOrder(1)).thenReturn(Optional.empty());
+        when(taskRepository.findByOrderAndCourseId(1, 1L)).thenReturn(Optional.empty());
         when(taskRepository.existsAnyTask()).thenReturn(true);
-        when(taskRepository.findLastTaskId()).thenReturn(1L);
+        when(taskRepository.findLastTaskIdByCourse(1L)).thenReturn(1L);
 
-        DataIntegrityException exception = assertThrows(DataIntegrityException.class, () -> taskService.verifyAndChangeOrder(3));
+        DataIntegrityException exception = assertThrows(DataIntegrityException.class, () -> taskService.verifyAndChangeOrder(3, 1L));
         assertEquals("Não é permitido adicionar uma atividade com ordem 3 pois ainda não existem atividades com ordens 2!", exception.getMessage());
     }
 

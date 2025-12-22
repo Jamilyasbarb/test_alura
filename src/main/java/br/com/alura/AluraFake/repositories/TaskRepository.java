@@ -25,7 +25,11 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findTaskAlreadyUtilizedByCourseId(@Param("statement") String statement,
                                                  @Param("courseId") Long courseId);
 
-    Optional<Task> findByOrderAndCourseId(Integer order, Long courseId);
+    @Query(
+            value = "SELECT * FROM Task WHERE order_number = :orderNumber AND course_id = :courseId",
+            nativeQuery = true
+    )
+    Optional<Task> findByOrderAndCourseId(Integer orderNumber, Long courseId);
 
     @Transactional
     @Modifying

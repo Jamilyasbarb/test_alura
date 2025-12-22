@@ -72,7 +72,7 @@ public class TaskService {
 
     public void validateTaskOneChoice(CreateTaskDTO createTaskDTO, boolean isMultipleChoice){
         int minOption = isMultipleChoice ? Constants.MINIMUM_OPTIONS_MULTIPLE_CHOICE : Constants.MINIMUM_OPTIONS_SINGLE_CHOICE;
-        if (createTaskDTO.options().size() < minOption || createTaskDTO.options().size() > 5)
+        if (createTaskDTO.options().size() < minOption || createTaskDTO.options().size() > Constants.MAXIMUM_OPTIONS)
             throw new DataIntegrityException("Adicione de 2 a 5 alternativas.");
 
         List<TaskOptionDTO> optionsChoice = createTaskDTO.options().stream().filter(TaskOptionDTO::isCorrect).toList();

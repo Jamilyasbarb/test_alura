@@ -5,6 +5,7 @@ import br.com.alura.AluraFake.domain.User;
 import br.com.alura.AluraFake.domain.enums.Role;
 import br.com.alura.AluraFake.repositories.CourseRepository;
 import br.com.alura.AluraFake.repositories.UserRepository;
+import br.com.alura.AluraFake.services.DBService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -18,11 +19,11 @@ public class DataSeeder implements CommandLineRunner {
     private String activeProfile;
 
     private final UserRepository userRepository;
-    private final CourseRepository courseRepository;
+    private final DBService dbService;
 
-    public DataSeeder(UserRepository userRepository, CourseRepository courseRepository) {
+    public DataSeeder(UserRepository userRepository, DBService dbService) {
         this.userRepository = userRepository;
-        this.courseRepository = courseRepository;
+        this.dbService = dbService;
     }
 
     @Override
@@ -30,10 +31,7 @@ public class DataSeeder implements CommandLineRunner {
         if (!"dev".equals(activeProfile)) return;
 
         if (userRepository.count() == 0) {
-            User caio = new User("Caio", "caio@alura.com.br", Role.STUDENT);
-            User paulo = new User("Paulo", "paulo@alura.com.br", Role.INSTRUCTOR);
-            userRepository.saveAll(Arrays.asList(caio, paulo));
-            courseRepository.save(new Course("Java", "Aprenda Java com Alura", paulo));
+            dbService.initializeDevDatabase();
         }
     }
 }

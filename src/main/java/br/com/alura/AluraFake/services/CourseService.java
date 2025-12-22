@@ -4,7 +4,9 @@ import br.com.alura.AluraFake.domain.Course;
 import br.com.alura.AluraFake.domain.User;
 import br.com.alura.AluraFake.domain.enums.CourseStatus;
 import br.com.alura.AluraFake.domain.enums.TaskType;
+import br.com.alura.AluraFake.dto.course.CourseListDTO;
 import br.com.alura.AluraFake.dto.course.InstructorCourseReportDTO;
+import br.com.alura.AluraFake.dto.course.InstructorCourseReportDTOInterface;
 import br.com.alura.AluraFake.exception.DataIntegrityException;
 import br.com.alura.AluraFake.exception.ObjectNotFoundException;
 import br.com.alura.AluraFake.mappers.CourseMapper;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CourseService {
@@ -50,13 +53,19 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public List<InstructorCourseReportDTO> findByInstructor(Long instructorId){
+    public InstructorCourseReportDTO findByInstructor(Long instructorId){
         User user = userRepository.findById(instructorId).orElseThrow(() -> new ObjectNotFoundException(User.class));
         if (!user.isInstructor())
             throw new IllegalArgumentException("Não foi possível entregar o relatório, pois o usuário não é um Instrutor");
 
-        return courseRepository.listCurseReportByInstructor(instructorId).stream()
-                .map(c -> courseMapper.toInstructorCourseReportFromInterface(c)).toList();
+        List<InstructorCourseReportDTOInterface> instructorCourseReports = courseRepository.listCurseReportByInstructor(instructorId);
+
+        if (Objects.isNull(instructorCourseReports) || instructorCourseReports.isEmpty())
+            return null;
+        List<CourseListDTO> courseListDTOS = instructorCourseReports.stream()
+                .map(c -> courseMapper.toCourseListDTO(c)).toList();
+
+        return courseMapper.toInstructorCourseReportFromInterface(instructorCourseReports.getFirst(), courseListDTOS);
 
     }
 }

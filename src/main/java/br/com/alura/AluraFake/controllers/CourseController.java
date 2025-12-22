@@ -61,7 +61,7 @@ public class CourseController {
 
     @PreAuthorize("hasRole('INSTRUCTOR')")
     @GetMapping("/{instructorId}/list")
-    public ResponseEntity<List<InstructorCourseReportDTO> > findCoursesByInstructor(@PathVariable("instructorId") Long instructorId) {
+    public ResponseEntity<InstructorCourseReportDTO > findCoursesByInstructor(@PathVariable("instructorId") Long instructorId) {
         return ResponseEntity.ok().body(courseService.findByInstructor(instructorId));
     }
 

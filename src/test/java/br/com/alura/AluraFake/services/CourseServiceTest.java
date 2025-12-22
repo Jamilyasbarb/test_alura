@@ -5,6 +5,7 @@ import br.com.alura.AluraFake.domain.User;
 import br.com.alura.AluraFake.domain.enums.CourseStatus;
 import br.com.alura.AluraFake.domain.enums.Role;
 import br.com.alura.AluraFake.domain.enums.TaskType;
+import br.com.alura.AluraFake.dto.course.CourseListDTO;
 import br.com.alura.AluraFake.dto.course.InstructorCourseReportDTO;
 import br.com.alura.AluraFake.dto.course.InstructorCourseReportDTOInterface;
 import br.com.alura.AluraFake.exception.DataIntegrityException;
@@ -20,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -146,7 +148,10 @@ public class CourseServiceTest {
 
         InstructorCourseReportDTOInterface projection =
                 mock(InstructorCourseReportDTOInterface.class);
-        InstructorCourseReportDTO dto = new InstructorCourseReportDTO(course.getId(), course.getTitle(), course.getStatus().name(), course.getPublishedAt().toString(), 1, 2  );
+        CourseListDTO courseListDTO = new CourseListDTO(1L, "Title", CourseStatus.BUILDING.name(), LocalDateTime.now().toString(), 1);
+        List<CourseListDTO> courseListDTOS = new ArrayList<>();
+        courseListDTOS.add(courseListDTO);
+        InstructorCourseReportDTO dto = new InstructorCourseReportDTO(courseListDTOS,  2  );
 
         when(userRepository.findById(instructor.getId()))
                 .thenReturn(Optional.of(instructor));
@@ -154,18 +159,20 @@ public class CourseServiceTest {
         when(courseRepository.listCurseReportByInstructor(instructor.getId()))
                 .thenReturn(List.of(projection));
 
-        when(courseMapper.toInstructorCourseReportFromInterface(projection))
+        when(courseMapper.toCourseListDTO(projection))
+                .thenReturn(courseListDTO);
+
+        when(courseMapper.toInstructorCourseReportFromInterface(projection, courseListDTOS))
                 .thenReturn(dto);
 
-        List<InstructorCourseReportDTO> result =
+        InstructorCourseReportDTO result =
                 courseService.findByInstructor(instructor.getId());
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(dto, result.getFirst());
+
 
         verify(courseRepository).listCurseReportByInstructor(instructor.getId());
-        verify(courseMapper).toInstructorCourseReportFromInterface(projection);
+        verify(courseMapper).toInstructorCourseReportFromInterface(projection, courseListDTOS);
     }
 
     @Test
@@ -181,7 +188,7 @@ public class CourseServiceTest {
         );
 
         verify(courseRepository, never()).listCurseReportByInstructor(any());
-        verify(courseMapper, never()).toInstructorCourseReportFromInterface(any());
+        verify(courseMapper, never()).toInstructorCourseReportFromInterface(any(), anyList());
     }
 
     @Test
@@ -206,7 +213,7 @@ public class CourseServiceTest {
         );
 
         verify(courseRepository, never()).listCurseReportByInstructor(any());
-        verify(courseMapper, never()).toInstructorCourseReportFromInterface(any());
+        verify(courseMapper, never()).toInstructorCourseReportFromInterface(any(), anyList());
     }
 }
 

@@ -1,11 +1,9 @@
 package br.com.alura.AluraFake.dto.course;
 
+import java.util.List;
+
 public record InstructorCourseReportDTO(
-        Long id,
-        String title,
-        String status,
-        String publishedAt,
-        Integer numberOfQuestion,
+        List<CourseListDTO> courses,
         Integer numberOfCoursesPublished
 ) {
 }

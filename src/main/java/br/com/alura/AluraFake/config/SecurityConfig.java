@@ -43,6 +43,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {
             "/login",
+            "/user/new"
     };
 
     @Bean

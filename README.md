@@ -1,5 +1,5 @@
 
-### Fluxograma - Validação Padrão
+### Fluxograma - Validações Padrão(Todos os Tipos de tarefa)
 ![Fluxograma Parte 1](docs/multipleChoiceFlowchart.png)
 
 ### Fluxograma - Multipla/Unica Questão

@@ -88,6 +88,9 @@ public class TaskService {
                 throw new DataIntegrityException("Pelo menos uma alternativa precisa ser Incorreta! ");
 
         }else{
+            if (optionsChoice.isEmpty())
+                throw new DataIntegrityException("Pelo menos uma alternativa precisa ser marcada! ");
+
             if (optionsChoice.size() > Constants.MAXIMUM_CHOICES_ALLOWED_SINGLE_CHOICE)
                 throw new DataIntegrityException("Assine apenas uma opção como correta.");
         }

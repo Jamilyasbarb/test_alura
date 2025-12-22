@@ -9,6 +9,8 @@ import br.com.alura.AluraFake.dto.task.TaskOptionDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 public class TaskMapper {
 
@@ -32,7 +34,8 @@ public class TaskMapper {
                 task.getStatement(),
                 task.getOrder(),
                 courseMapper.toCourseDTOFromEntity(task.getCourse()),
-                task.getTaskOptions().stream().map(option -> new TaskOptionDTO(option.isCorrect(), option.getAlternative())).toList()
+                Objects.nonNull(task.getTaskOptions()) ?
+                        task.getTaskOptions().stream().map(option -> new TaskOptionDTO(option.isCorrect(), option.getAlternative())).toList() : null
         );
     }
 }

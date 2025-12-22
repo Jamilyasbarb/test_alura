@@ -27,7 +27,6 @@ public class Course {
     public Course(){}
 
     public Course(String title, String description, User instructor) {
-        Assert.isTrue(instructor.isInstructor(), "Usuario deve ser um instrutor");
         this.title = title;
         this.instructor = instructor;
         this.description = description;
